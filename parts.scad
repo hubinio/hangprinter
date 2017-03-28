@@ -670,209 +670,54 @@ module top_plate(){
 //rotate([180,0,15])
 //top_plate();
 
-//%cube([139,139,20]);
-module parted_top_plate_piece1(){
-  th = Top_plate_thickness;
-  flerp_side=21;
-  height = 15;
-  melt=0.1;
-  translate([0,Full_tri_side/(2*Sqrt3),0])
-  difference(){
-    eq_tri(Full_tri_side/2, th);
-    translate([0,-6,-1])
-      eq_tri(Full_tri_side/2-15+6*Sqrt3, th+2);
-    translate([0,- Full_tri_side/(2*Sqrt3),0])
-    // Cut the sharp points
-    for(k=[0,-1])
-      mirror([k,0,0])
-        rotate([0,0,30])
-        translate([(Full_tri_side-15)/(2*Sqrt3),0,-1])
-        cube([15,5/2,th+2]);
+module bearing_filled_sandwich(worm=false){
+  if(worm){
+    //color(Printed_color_2)
+      translate([0,0,Sandwich_height])
+      rotate([180,0,0])
+      sandwich(worm=true); // Have worm gear as far down as possible
+  } else {
+    //color(Printed_color_2)
+      sandwich();
   }
-  translate(Line_contact_d_xy)
-    translate([0,-5.5,0])
-    top_flerp(flerp_side);
-  // Hook holes for line
-  translate(Line_contact_d_xy)
-    translate([0,0,th-melt])
-    hook(height-th+melt);
-  // Flerp to screw together parts
-  for(k=[0,-1])
-    mirror([k,0,0])
-      rotate([0,0,30])
-      translate([(Full_tri_side-15)/(2*Sqrt3),1.5,0])
-      difference(){
-        cube([14,3,th]);
-        translate([10,-1,th/2])
-          rotate([-90,0,0])
-          cylinder(r=M3_diameter/2, h=5);
-      }
+  Bearing_608();
+  translate([0,0,Bearing_608_width])
+  color("gold") lock(Lock_radius_1, Lock_radius_2, Lock_height);
 }
-//parted_top_plate_piece1();
-//translate([-139/2,-17,0])
-//%cube([139,139,20]);
-//parted_top_plate_piece1();
-//translate([0,-25,0,])
-//parted_top_plate_piece1();
-//translate([0,2*-25,0,])
-//parted_top_plate_piece1();
 
-// Fits on a Huxley
-module parted_top_plate_piece2(){
-  th = Top_plate_thickness;
-  flerp_side=22;
-  height = 15;
-  melt=0.1;
-  cylinder(r=2, h=height);
-  rotate([0,0,60])
-    for(i=[0,120,240]) rotate([0,0,i])
-      difference(){
-        translate([-1.5,0,0])
-          cube([3,Full_tri_side*Sqrt3/6,height]);
-        translate([-2.5,0,height])
-          rotate([-9.7,0,0])
-          cube([5,Full_tri_side*Sqrt3/6+3,height]);
-      }
-  for(k=[[0,0,0],[-1,0,0],[1,Sqrt3,0]])
-    mirror(k)
-      rotate([0,0,30])
-      translate([(Full_tri_side-15)/(2*Sqrt3),-1.5,0])
-      difference(){
-        cube([14,3,th]);
-        translate([10,-1,th/2])
-          rotate([-90,0,0])
-          cylinder(r=M3_diameter/2, h=5);
-      }
-}
-//parted_top_plate_piece2();
-
-module side_plate2(height=15,th=7){
-  s = Abc_xy_split + 2*6;
-  translate([0,0,0]){
-    difference(){
-      translate([-s/2,-th,-height/2])
-        cube([s,th,height]);
-      // Wall screw holes
-      for(k=[1,0])
-        mirror([k,0,0])
-          translate([Abc_xy_split/2 - 10,-th-1,0])
-            rotate([-90,0,0]){
-              cylinder(r=M3_diameter/2, h=Big);
-              translate([0,0,th/2]) cylinder(r=M3_head_diameter/2,h=Big);
-            }
-      // Hook holes
-      for(k=[1,0])
-        mirror([k,0,0]){
-          translate([Abc_xy_split/2,-th-1,0])
-            rotate([-90,0,0])
-              cylinder(r=0.75, h=Big);
-          translate([-1 + Abc_xy_split/2, -th - th +2, -height])
-            cube([2, th, 2*height]);
-          // Holes for adjustment screws. Intentionally narrow
-          translate([20,-th/2,0]){
-            translate([0,0,-Big/2])
-              cylinder(d=M3_diameter, h=Big);
-            // Nut traps for adjustment screws
-            translate([0,-0.1,2.5])
-              rotate([90,0,0])
-              rotate([0,0,90])
-              M3_nyloc_trap();
-          }
-
-        }
-      // Mark wall action point
-      rotate([15,0,0]) translate([-1,0,0]) cube([2,5,height]);
-      mirror([0,0,1])
-        rotate([15,0,0]) translate([-1,0,0]) cube([2,5,height]);
-    }
-    // Pulleys to wind line around
-    for(k=[1,-1])
-      translate([k*(Abc_xy_split/2 - 8),0,0]){
-        translate([-4.5,-3,height/2-0.1]) cylinder(r=2.5, h=7);
-        translate([ 4.5,-3,height/2-0.1]) cylinder(r=2.5, h=7);
-      }
+module placed_sandwich(a_render=true, b_render=true, c_render=true, d_render=true){
+  if(a_render){
+    translate([0,0,Line_contacts_abcd_z[A] - Snelle_height/2])
+      bearing_filled_sandwich();
+  }
+  if(b_render){
+    translate([0,0,Line_contacts_abcd_z[B] - Snelle_height/2])
+      bearing_filled_sandwich();
+  }
+  if(c_render){
+    translate([0,0,Line_contacts_abcd_z[C] - Snelle_height/2])
+      // Brim must not collide with d motor
+      bearing_filled_sandwich();
+  }
+  if(d_render){
+    translate([0,0,Bottom_plate_thickness + Bottom_plate_sandwich_gap])
+      // Brim must not collide with d motor
+      bearing_filled_sandwich(worm=true);
   }
 }
-//side_plate2();
+//placed_sandwich();
 
-module side_plate3(height=15,th=7){
-  s = Abc_xy_split + 2*6;
-  d = 7;
-  a = s/2 - Sqrt3*d/2;
-  translate([0,th,0]){
-    difference(){
-      union(){
-        // Main cube (the one where lines enter)
-        translate([-s/2,-th,-height/2])
-          cube([s,th,height]);
-        // Short leg
-        translate([-s/2+Sqrt3*d,-1,-height/2])
-          cube([th, d+1, height]);
-        // Long leg
-        translate([s/2 - th - Sqrt3*d,-4,-height/2])
-          rotate([0,0,30])
-          cube([th, a+0, height]);
-        // Foot of short leg
-        translate([-s/2+Sqrt3*d+th/2,d-th*Sqrt3/2,-height/2])
-          rotate([0,0,30])
-          cube([15,th,height]);
-        // Foot of long leg
-        translate([-s/2+Sqrt3*d+th/2,d-th*Sqrt3/2,-height/2])
-          rotate([0,0,30])
-          translate([Sqrt3*a-2*d-14-1.5-th,0,0])
-          cube([16,th,height]);
-        // Pulleys to wind line around
-        for(k=[1,-1])
-          translate([k*(Abc_xy_split/2 - 8),0,0]){
-            translate([-4.5,-3,height/2-0.1]) cylinder(r=2.5, h=7);
-            translate([ 4.5,-3,height/2-0.1]) cylinder(r=2.5, h=7);
-          }
-      }
-      // Hook holes (Where lines enter)
-      for(k=[1,0])
-        mirror([k,0,0]){
-          translate([Abc_xy_split/2,-th-1,0])
-            rotate([-90,0,0])
-              cylinder(r=0.75, h=Big);
-          translate([-1 + Abc_xy_split/2, -2, -height])
-            cube([2, th, 2*height]);
-          // Holes for adjustment screws.
-          translate([20,-th/2,0]){
-            translate([0,0,-Big/2])
-              cylinder(d=M3_diameter,h=Big);
-            // Nut traps for adjustment screws
-            mirror([0,1,0])
-              translate([0,-0.1,2.5])
-              rotate([90,0,0])
-              rotate([0,0,90])
-              #M3_nyloc_trap();
-          }
-        }
-      translate([-s/2+27,0,0])
-      rotate([-90,0,30]){
-        translate([0,0,-11]) cylinder(r=7/2,h=20);
-        cylinder(r=M3_diameter/2,h=42,center=true);
-      }
 
-      translate([s/2-29,0,0])
-        rotate([-90,0,30]){
-        translate([0,0,20]) cylinder(r=M3_diameter/2,h=54);
-        translate([0,0,20]) cylinder(r=7/2,h=40);
-        // A little space for a screwdriver along long leg
-        rotate([-7,0,0])
-        translate([0,-7,-11]) cylinder(r=7/2,h=44);
-      }
-      // Mark wall action point
-      for(k=[0,1])
-        mirror([0,0,k])
-        translate([0,-th,0])
-        rotate([-15,0,0]) translate([-1,-5,0]) cube([2,5,height]);
-    }
-  }
+module sandwich_stack_ceiling(){
+  sandwich_stack_height = 4*Sandwich_gear_height // ABCD
+        + 9*Snelle_height // 2A, 2B, 2C, 3D
+        + 13*Sandwich_edge_thickness; // 3A, 3B, 3C, 4D
+
+  // M8 screw
+  cylinder(r = 4, h = sandwich_stack_height);
+  placed_sandwich();
 }
-//mirror([1,0,0])
-//side_plate3();
-
+sandwich_stack_ceiling();
 
 // Only for rendering
 module hobbed_insert(){

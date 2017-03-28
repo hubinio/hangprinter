@@ -58,43 +58,6 @@ module placed_lines(){
 }
 //placed_lines();
 
-module bearing_filled_sandwich(worm=false){
-  if(worm){
-    //color(Printed_color_2)
-      translate([0,0,Sandwich_height])
-      rotate([180,0,0])
-      sandwich(worm=true); // Have worm gear as far down as possible
-  } else {
-    //color(Printed_color_2)
-      sandwich();
-  }
-  Bearing_608();
-  translate([0,0,Bearing_608_width])
-  color("gold") lock(Lock_radius_1, Lock_radius_2, Lock_height);
-}
-
-module placed_sandwich(a_render=true, b_render=true, c_render=true, d_render=true){
-  if(a_render){
-    translate([0,0,Line_contacts_abcd_z[A] - Snelle_height/2])
-      bearing_filled_sandwich();
-  }
-  if(b_render){
-    translate([0,0,Line_contacts_abcd_z[B] - Snelle_height/2])
-      bearing_filled_sandwich();
-  }
-  if(c_render){
-    translate([0,0,Line_contacts_abcd_z[C] - Snelle_height/2])
-      // Brim must not collide with d motor
-      bearing_filled_sandwich();
-  }
-  if(d_render){
-    translate([0,0,Bottom_plate_thickness + Bottom_plate_sandwich_gap])
-      // Brim must not collide with d motor
-      bearing_filled_sandwich(worm=true);
-  }
-}
-//placed_sandwich();
-
 module sandwich_marks(){
   intersection(){ // Intersection made to mark part of sandwich
     placed_sandwich();
@@ -202,8 +165,6 @@ module placed_abc_motors(motor_gear_render=true){
   }
 }
 //placed_abc_motors();
-//placed_sandwich();
-//placed_lines();
 
 module placed_d_motor(with_worm=true){
   d_motor_move(){
@@ -255,25 +216,3 @@ module placed_ramps(){
     Fancy_Ramps_holder();
 }
 //placed_ramps();
-
-module placed_plates(){
-  translate(Ceiling_action_point)
-    top_plate();
-  translate(Wall_action_point_a)
-    side_plate2();
-  translate(Wall_action_point_b)
-    rotate([0,0,-90+30])
-      mirror([1,0,0])
-        side_plate3();
-  translate(Wall_action_point_c)
-    rotate([0,0,90-30])
-      side_plate3();
-}
-//placed_plates();
-
-
-//color("green")
-//placed_lines();
-//placed_sandwich();
-//bottom_plate();
-//placed_abc_motors();
