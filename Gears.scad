@@ -3,7 +3,7 @@
 include <measured_numbers.scad>
 include <design_numbers.scad>
 include <util.scad>
-use <Nema17_and_Ramps_and_bearings.scad>
+use <Non-printed.scad>
 
 // Sweep.scad contains code from
 // https://github.com/openscad/scad-utils

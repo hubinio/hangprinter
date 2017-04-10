@@ -2,8 +2,8 @@ include <measured_numbers.scad>
 include <design_numbers.scad>
 use <parts.scad>
 use <placed_parts.scad>
-use <render_parts.scad>
-use <Nema17_and_Ramps_and_bearings.scad>
+//use <render_parts.scad>
+use <Non-printed.scad>
 
 // Style:
 //  - Global parameters starts with capital letter, others don't
@@ -17,16 +17,15 @@ use <Nema17_and_Ramps_and_bearings.scad>
 // Rendering control
 // TODO: move _all_ rendering control back up here
 render_bottom_plate  = true;
-render_sandwich      = false;
-render_abc_motors    = false;
-render_fish_rings    = false;
-render_lines         = false;
-render_extruder      = false;
-render_hotend        = false;
-render_ramps         = false;
-render_plates        = false;
-render_filament      = false;
-render_d_motor       = false;
+render_sandwich      = true;
+render_abc_motors    = true;
+render_fish_rings    = true;
+render_lines         = true;
+render_extruder      = true;
+render_hotend        = true;
+render_ramps         = true;
+render_filament      = true;
+render_d_motor       = true;
 
 // Measure distance to hot end tip
 //mirror([0,0,1])
@@ -68,10 +67,6 @@ module full_render(){
   }
   if(render_ramps){
     placed_ramps();
-  }
-  if(render_plates){
-    color(Printed_color_1)
-    placed_plates();
   }
   if(render_filament){
     filament();

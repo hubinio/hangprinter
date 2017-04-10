@@ -1,9 +1,9 @@
 include <measured_numbers.scad>
 include <util.scad>
 include <design_numbers.scad>
-use <Nema17_and_Ramps_and_bearings.scad>
+use <Non-printed.scad>
 use <Gears.scad>
-use <render_parts.scad>
+//use <render_parts.scad>
 
 module d_motor_move(){
   rotate([0,0,D_placement_angle+24]) // TODO: parametrize 24 here
@@ -452,79 +452,9 @@ module bottom_plate(){
 //** bottom_plate end **//
 
 // Sandwich is defined in Gears.scad
-// Motors are defined in Nema17_and_Ramps_and_bearings.scad
-
+// Motors are defined in Non-printed.scad
 
 //** extruder start **//
-
-module fan(width=30, height=10){
-  linear_extrude(height=height, twist=-40)
-  for(i=[0:6]){
-    rotate([0,0,(360/7)*i])
-      translate([0,-0.5])
-        square([width/2 - 2, 1]);
-  }
-  cylinder(h=height, r=width/4.5);
-
-  difference(){
-    translate([-width/2, -width/2,0])
-      cube([width,width,height]);
-    translate([0,0,-1]) cylinder(r=width/2 - 1, h=height+2);
-    for(i=[1,-1]){
-      for(k=[1,-1]){
-        translate([i*width/2-i*2.5,k*width/2-k*2.5,-1])
-          cylinder(r=1, h=height+2);
-      }
-    }
-  }
-}
-
-module Volcano_block(){
-  small_height = 18.5;
-  large_height = 20;
-  color("silver"){
-  translate([-15.0,-11/2,0])
-    difference(){
-      cube([20,11,large_height]);
-      translate([7,0,small_height+3])
-        rotate([90,0,0])
-        cylinder(h=23, r=3, center=true,$fn=20);
-      translate([-(20-7+1.5),-1,small_height]) cube([22,13,2]);
-    }
-    }
-  color("gold"){
-    translate([0,0,-3]) cylinder(h=3.1,r=8/2,$fn=6);
-    translate([0,0,-3-2]) cylinder(h=2.01, r2=6/2, r1=2.8/2);
-  }
-}
-//Volcano_block();
-
-// Contains a lot of unnamed measured numbers...
-module e3d_v6_volcano_hotend(fan=1){
-  lpl = 2.1;
-  if(fan){
-  color("blue") rotate([90,0,0]) import("stl/V6_Duct.stl");
-  color("black")
-    translate([-15,0,15])
-      rotate([0,-90,0])
-        fan(width=30, height=10);
-  }
-  color("LightSteelBlue"){
-    cylinder(h=26, r1=13/2, r2=8/2);
-    for(i = [0:10]){
-      translate([0,0,i*2.5]) cylinder(h=1, r=22.3/2);
-    }
-    translate([0,0,E3d_heatsink_height-3.7])     cylinder(h=3.7, r=E3d_mount_big_r);
-    translate([0,0,E3d_heatsink_height-3.7-6.1]) cylinder(h=6.2, r=E3d_mount_small_r);
-    translate([0,0,E3d_heatsink_height-3.7-6-3]) cylinder(h=3, r=E3d_mount_big_r);
-    translate([0,0,26-0.1]) cylinder(h=E3d_heatsink_height-(12.7+26)+0.2, r=8/2);
-    translate([0,0,26+1.5]) cylinder(h=1, r=E3d_mount_big_r);
-    // echo(42.7-(12.7+26));
-    translate([0,0,-lpl-0.1]) cylinder(h=lpl+0.2,r=2.8/2);
-  }
-  translate([0,0,-20-lpl]) Volcano_block();
-}
-//e3d_v6_volcano_hotend();
 
 module e3d_v6_mount_bore(d = 5){
   // Bowden tube
@@ -708,6 +638,7 @@ module placed_sandwich(a_render=true, b_render=true, c_render=true, d_render=tru
 //placed_sandwich();
 
 
+// TODO
 module sandwich_stack_ceiling(){
   sandwich_stack_height = 4*Sandwich_gear_height // ABCD
         + 9*Snelle_height // 2A, 2B, 2C, 3D
@@ -717,7 +648,7 @@ module sandwich_stack_ceiling(){
   cylinder(r = 4, h = sandwich_stack_height);
   placed_sandwich();
 }
-sandwich_stack_ceiling();
+//sandwich_stack_ceiling();
 
 // Only for rendering
 module hobbed_insert(){
@@ -1174,3 +1105,104 @@ module bearing_housing(){
   print();
 }
 //bearing_housing();
+
+module Fancy_Ramps_holder(){
+  th = 1.5;
+  bones = 2;
+  push_y = 16;
+
+  // A cross used for a Nema17 mount later
+  module cross(){
+    rotate([0,0,0])
+      polygon([for (i=[0:2:359.9])
+          9*[cos(i), sin(i)]
+          + 17*pow(sin(4/2*i),4)*[cos(i),sin(i)]]);
+  }
+
+  module bones_place(){
+      rotate([0,0,B_placement_angle])
+        translate([0,
+            Four_point_five_point_radius,
+            -Nema17_cube_height-bones])
+        rotate([0,0,45])
+          Nema17_screw_translate(3)
+            children(0);
+      rotate([0,0,A_placement_angle])
+        translate([0,
+          Four_point_five_point_radius,
+          -Nema17_cube_height-bones])
+        rotate([0,0,45])
+          rotate([0,0,180])
+            Nema17_screw_translate(3)
+              children(0);
+  }
+
+  difference(){
+    union(){
+      bones_place()
+        cylinder(d=7, h=bones+th);
+      for(i=[B_placement_angle, A_placement_angle])
+        rotate([0,0,i])
+          translate([0,
+              Four_point_five_point_radius,
+              -Nema17_cube_height-bones])
+          rotate([0,0,45]){
+            linear_extrude(height=th, convexity=6)
+              cross();
+          }
+      // Naming corners in this fancy polygon...
+      a = -20.6;
+      d = 28.75;
+      e = 10.3;
+      j = 6;
+      translate([-Ramps_length/2,16,-Nema17_cube_height-bones])
+        linear_extrude(height=th, convexity=10)
+        polygon([[-a,-j],
+            [-a,0],
+            [Ramps_length+a,0],
+            [Ramps_length+a, -j],
+            [Ramps_length+d, e],
+            [Ramps_length, Ramps_depth],
+            [0, Ramps_depth],
+            [-d, e]
+            ]);
+    } // end union
+
+    bones_place()
+      translate([0,0,-bones])
+      cylinder(d=3.2,h=3*bones);
+
+    translate([-Ramps_length/2,16,-Nema17_cube_height-bones])
+      // Straight Nema17 screw holes
+      for(i=[0:8]){
+        translate([0.5*Nema17_screw_hole_dist + 6
+            +i*Nema17_screw_hole_dist/4,
+            Ramps_depth/2,
+            -1]){
+          Nema17_screw_holes(M3_diameter,10);
+          translate([0,9,0])
+            Nema17_screw_holes(M3_diameter,10);
+          translate([0,-9,0])
+            Nema17_screw_holes(M3_diameter,10);
+        }
+      }
+  }
+}
+//Fancy_Ramps_holder();
+
+module Nema17_damping_plate(){
+  cw = Nema17_cube_width;
+  rh = Nema17_ring_height+0.5;
+  difference(){
+    translate([-cw/2,-cw/2,0])
+      cube([cw,cw,rh]);
+    translate([0,0,-1])
+      Nema17_screw_holes(M3_diameter+0.2, h=rh+2);
+    cylinder(r=Nema17_ring_diameter/2+0.5, h=2*rh+2, center=true);
+    for(i=[45:90:359])
+      rotate([0,0,i])
+        translate([53.36/2,-cw/2,-1])
+          cube([cw,cw,rh+2]);
+  }
+}
+//Nema17_damping_plate();

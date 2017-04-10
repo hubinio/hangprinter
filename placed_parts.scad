@@ -3,8 +3,8 @@ include <util.scad>
 include <design_numbers.scad>
 use <Gears.scad>
 use <parts.scad>
-use <render_parts.scad>
-use <Nema17_and_Ramps_and_bearings.scad>
+//use <render_parts.scad>
+use <Non-printed.scad>
 
 // All modules in here can be rendered through the
 // full_render module in Hangprinter.scad
