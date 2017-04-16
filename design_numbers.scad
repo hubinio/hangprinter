@@ -69,10 +69,10 @@ fish_ring_d_rotation   = 107;
 
 //** Gear parameters **//
 Circular_pitch_top_gears = 400;
-//Motor_gear_teeth = 11;
-Motor_gear_teeth = 9;
-//Sandwich_gear_teeth = 38;
-Sandwich_gear_teeth = 43;
+Motor_gear_teeth = 7;
+// Want sandwich pitch radius to be at least 2*47.77 = 95.540
+//Sandwich_gear_teeth = 43;
+Sandwich_gear_teeth = 80;
 Circular_pitch_extruder_gears = 180;
 Small_extruder_gear_teeth = 15;
 // 1/3 is sweetspot ratio
@@ -86,9 +86,7 @@ Motor_gear_d_height = Line_contacts_abcd_z[D];
 Big_extruder_gear_height = 4;
 Small_extruder_gear_height = 6;
 
-Motor_gear_shaft_radius_A = 7.5; // A motor gear shaft is most likely to break. Thicken it.
-Motor_gear_shaft_radius_BC = 7;
-Snelle_radius = 33; // This is the radius the line will wind around.
+Snelle_radius = 33*2; // This is the radius the line will wind around.
 Snelle_brim   = Snelle_radius + 12;
 // TODO: worm should use this
 // How much motor shaft is flattened away (in radial direction)?
@@ -132,6 +130,8 @@ Motor_gear_radius            = Motor_gear_pitch + Motor_gear_pitch*2/Motor_gear_
 Sandwich_gear_pitch          = Sandwich_gear_teeth*Circular_pitch_top_gears/360;
 echo(Sandwich_gear_pitch);
 Sandwich_radius              = Sandwich_gear_pitch + Sandwich_gear_pitch*2/Sandwich_gear_teeth;
+echo("Sandwich_radius");
+echo(Sandwich_radius);
 Big_extruder_gear_pitch      = Big_extruder_gear_teeth*Circular_pitch_extruder_gears/360;
 Small_extruder_gear_pitch    = Small_extruder_gear_teeth*Circular_pitch_extruder_gears/360;
 Pitch_difference_extruder    = Big_extruder_gear_pitch + Small_extruder_gear_pitch;
@@ -201,3 +201,5 @@ Sstruder_hot_end_bore_z = -Sstruder_height + Nema17_cube_width/2 + 2.5; // Move 
 Sstruder_gear_teeth = 10;
 Sstruder_gear_pitch = Hobbed_insert_diameter/2 + Extruder_filament_opening/2;
 Sstruder_gear_circular_pitch = Sstruder_gear_pitch*360/Sstruder_gear_teeth;
+
+Motor_gear_shaft_radius = Motor_gear_radius;

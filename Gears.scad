@@ -190,10 +190,18 @@ module my_gear(teeth, height){
 //my_gear(40,10);
 
 module decoration_holes(){
-  for(i = [1:60:360]){
-    rotate([0,0,i])
-      translate([2*Snelle_radius/3,0,-1])
-      cylinder(r=8.5,h=Big);
+  spoke_width = 4;
+  difference(){
+    translate([0,0,-1])
+      cylinder(r=Snelle_radius - 5, h=Big);
+    translate([0,0,-2])
+      cylinder(d=Bearing_608_outer_diameter + 5, h=Big+1);
+    for(i = [0:360/6:359.9]){
+      rotate([0,0,i])
+      translate([-Snelle_radius,-spoke_width/2-Bearing_608_outer_diameter/2,0])
+      cube([2*Snelle_radius, spoke_width, Sandwich_height]);
+    }
+
   }
 }
 
@@ -289,7 +297,7 @@ module snelle(){
   color("red")
   inverse_torx();
 }
-//snelle();
+snelle();
 
 module snelle_line_buildup_visualization(){
   module snelle(){
@@ -338,8 +346,8 @@ module snelle_line_buildup_visualization(){
 }
 //snelle_line_buildup_visualization();
 
-module motor_gear(height = Motor_protruding_shaft_length, shaft_radius = Motor_gear_shaft_radius_BC){
-  swgh  = Sandwich_gear_height  - 0.4;  // allow some space for easier printing
+module motor_gear(height = Motor_protruding_shaft_length, shaft_radius = Motor_gear_shaft_radius){
+  swgh  = Sandwich_gear_height  + 0.4;  // allow some space for easier printing
   melt = 0.1;
   teeth = Motor_gear_teeth;
 
@@ -360,33 +368,17 @@ module motor_gear(height = Motor_protruding_shaft_length, shaft_radius = Motor_g
 
   difference(){
     union(){
-      translate([0,0,height - swgh])
-        my_gear(teeth, swgh);
+      translate([0,0,(height - swgh)/2])
+        my_gear(teeth, swgh + melt);
       // Shaft cylinder
-      cylinder(r = shaft_radius, h = height - swgh + melt, $fn=40);
+      cylinder(r=shaft_radius, h = (height - swgh)/2 + melt, $fn=40);
+      translate([0,0,height/2 + swgh/2])
+        cylinder(r = shaft_radius, h = (height - swgh)/2, $fn=40);
     }
     the_bore();
   }
 }
 //motor_gear();
-
-module motor_gear_a(){
-  motor_gear(Motor_gear_a_height, Motor_gear_shaft_radius_A);
-}
-//rotate([180,0,0])
-//motor_gear_a();
-
-module motor_gear_b(){
-  motor_gear(Motor_gear_b_height, Motor_gear_shaft_radius_BC);
-}
-//rotate([180,0,0])
-//motor_gear_b();
-
-module motor_gear_c(){
-  motor_gear(Motor_gear_c_height, Motor_gear_shaft_radius_BC);
-}
-//rotate([180,0,0])
-//motor_gear_c();
 
 // Visualization only
 module gear_friends(){

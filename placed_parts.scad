@@ -154,13 +154,13 @@ module placed_abc_motors(motor_gear_render=true){
     color(Printed_color_2){
       rotate([0,0,C_placement_angle])
         translate([0,Four_point_five_point_radius, Bottom_plate_thickness + 5])
-        motor_gear_c();
+        motor_gear();
       rotate([0,0,B_placement_angle])
         translate([0,Four_point_five_point_radius, Bottom_plate_thickness])
-        motor_gear_b();
+        motor_gear();
       rotate([0,0,A_placement_angle])
         translate([0,Four_point_five_point_radius, Bottom_plate_thickness])
-        motor_gear_a();
+        motor_gear();
     }
   }
 }

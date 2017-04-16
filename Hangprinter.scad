@@ -19,13 +19,13 @@ use <Non-printed.scad>
 render_bottom_plate  = true;
 render_sandwich      = true;
 render_abc_motors    = true;
-render_fish_rings    = true;
-render_lines         = true;
-render_extruder      = true;
-render_hotend        = true;
-render_ramps         = true;
-render_filament      = true;
-render_d_motor       = true;
+render_fish_rings    = false;
+render_lines         = false;
+render_extruder      = false;
+render_hotend        = false;
+render_ramps         = false;
+render_filament      = false;
+render_d_motor       = false;
 
 // Measure distance to hot end tip
 //mirror([0,0,1])
@@ -34,15 +34,15 @@ render_d_motor       = true;
 module full_render(){
   if(render_bottom_plate){
     color(Printed_color_1)
-    bottom_plate();
+    //bottom_plate();
     // For better rendering performance, precompile bottom_plate
-    //precompiled("stl/Bottom_plate_qty_1.stl");
+    precompiled("stl/Bottom_plate_qty_1.stl");
     //precompiled("stl/Complete_printer_24_nov_2016/Sparser_bottom_plate_qty_1.stl");
   }
   if(render_sandwich){
     // For better rendering performance, precompile placed sandwich
     //placed_sandwich(false, false, false, true);
-    placed_sandwich(true, true, true, true);
+    placed_sandwich(true, false, false, false);
     //color(Printed_color_2)
     //precompiled("stl/Sandwich_25_Nov_2016.stl");
   }
